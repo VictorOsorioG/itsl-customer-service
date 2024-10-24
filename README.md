@@ -6,9 +6,12 @@ Customer Service for the IT Staff Leasing application develop as part of Globant
 
 - Java
 - Spring Boot
+- Spring Webflux
 - Junit
 - Mockito
 - Jacoco
+- Flyway
+- PostgresQL
 
 
 ## Features
