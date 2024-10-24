@@ -1,28 +1,26 @@
 spring:
   application:
     name: itsl-customer-service
-  server:
-    port: 8081
-    servlet:
-      context-path: /itsl/customer-service
   datasource:
     driverClassName: org.postgresql.Driver
     url: ${ITLS_DB_URL}
     username: ${ITLS_DB_USERNAME}
     password: ${ITLS_DB_PASSWORD}
-    schema: ${ITLS_DB_CUSTOMER_SERVICE_SCHEMA}
   jpa:
     hibernate:
         ddl-auto: none
     show-sql: true
+    properties:
+      hibernate:
+        default_schema: your_schema_name
   logging:
     level:
       root: info
+  flyway:
+    schemas: customer_service
+    enabled: true
 
-flyway:
-  url: ${ITLS_DB_URL}
-  username: ${ITLS_DB_USERNAME}
-  password: ${ITLS_DB_PASSWORD}
-  schema: ${ITLS_DB_CUSTOMER_SERVICE_SCHEMA}
-
-
+server:
+  port: 8081
+  servlet:
+    context-path: /itsl/customer-service
