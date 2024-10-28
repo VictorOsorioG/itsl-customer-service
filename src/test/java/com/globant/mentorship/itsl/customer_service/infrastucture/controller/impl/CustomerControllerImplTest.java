@@ -3,6 +3,7 @@ package com.globant.mentorship.itsl.customer_service.infrastucture.controller.im
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.application.service.CustomerApplicationService;
 import com.globant.mentorship.itsl.customer_service.application.service.impl.CustomerApplicationServiceImpl;
+import com.globant.mentorship.itsl.customer_service.infrastucture.controller.CustomerController;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -11,19 +12,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@WebFluxTest
 @AutoConfigureWebTestClient
-@ExtendWith(MockitoExtension.class)
+@WebFluxTest(CustomerControllerImpl.class)
 class CustomerControllerImplTest {
 
     private final String BASE_URI = "/api/v1/customer";
 
-    @Mock
+    @MockBean
     private CustomerApplicationService customerApplicationService;
     @Autowired
     WebTestClient webTestClient;
@@ -44,7 +45,6 @@ class CustomerControllerImplTest {
                     CustomerDto customerDtoResponse = customerDtoEntityExchangeResult.getResponseBody();
                     assertEquals(customerUdeADto, customerDtoResponse);
                 });
-
     }
 
     @Test
