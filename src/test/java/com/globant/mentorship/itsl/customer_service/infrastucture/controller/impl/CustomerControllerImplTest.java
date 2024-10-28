@@ -2,13 +2,8 @@ package com.globant.mentorship.itsl.customer_service.infrastucture.controller.im
 
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.application.service.CustomerApplicationService;
-import com.globant.mentorship.itsl.customer_service.application.service.impl.CustomerApplicationServiceImpl;
-import com.globant.mentorship.itsl.customer_service.infrastucture.controller.CustomerController;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
@@ -49,7 +44,6 @@ class CustomerControllerImplTest {
 
     @Test
     void GivenWrongId_WhenGetCustomerById_ThenReturnMonoError() {
-
     }
 
     private CustomerDto buildCustomerUdeADto() {
