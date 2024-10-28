@@ -12,7 +12,7 @@ spring:
     show-sql: true
     properties:
       hibernate:
-        default_schema: your_schema_name
+        default_schema: ${ITLS_DB_SCHEMA}
   logging:
     level:
       root: info
