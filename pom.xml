@@ -110,6 +110,7 @@
 						<exclude>**/config/*</exclude>
 						<exclude>**/mapper/*</exclude>
 						<exclude>**/repository/*</exclude>
+						<exclude>**/CustomerServiceApplication.class</exclude>
 					</excludes>
 				</configuration>
 				<executions>
