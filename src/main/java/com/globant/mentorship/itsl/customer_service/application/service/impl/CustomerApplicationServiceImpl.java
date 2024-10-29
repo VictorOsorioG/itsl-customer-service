@@ -2,6 +2,7 @@ package com.globant.mentorship.itsl.customer_service.application.service.impl;
 
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.application.service.CustomerApplicationService;
+import com.globant.mentorship.itsl.customer_service.infrastucture.exception.standard_exception.CustomerNotFound;
 import com.globant.mentorship.itsl.customer_service.infrastucture.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,6 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
                 .map(customer -> Mono.just(
                         modelMapper.map(customer, CustomerDto.class)
                 ))
-                .orElseThrow();
+                .orElseThrow(CustomerNotFound::new);
     }
 }
