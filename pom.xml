@@ -111,7 +111,7 @@
 						<exclude>**/mapper/*</exclude>
 						<exclude>**/repository/*</exclude>
 						<exclude>**/CustomerServiceApplication.class</exclude>
-						<exclude>**/exception/*</exclude>
+						<exclude>**/exception/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>
