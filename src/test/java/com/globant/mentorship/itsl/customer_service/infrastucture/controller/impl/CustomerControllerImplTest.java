@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebFluxTest(CustomerControllerImpl.class)
 class CustomerControllerImplTest {
 
-    private final String BASE_URI = "/api/v1/customer";
+    private final String BASE_URL = "/api/v1/customer";
 
     @MockBean
     private CustomerApplicationService customerApplicationService;
@@ -31,7 +31,7 @@ class CustomerControllerImplTest {
         Mockito.when(customerApplicationService.getCustomer(customerUdeAId))
                 .thenReturn(Mono.just(customerUdeADto));
         webTestClient.get()
-                .uri(BASE_URI + "/" + customerUdeAId)
+                .uri(BASE_URL + "/" + customerUdeAId)
                 .exchange()
                 .expectStatus()
                 .is2xxSuccessful()
@@ -40,10 +40,8 @@ class CustomerControllerImplTest {
                     CustomerDto customerDtoResponse = customerDtoEntityExchangeResult.getResponseBody();
                     assertEquals(customerUdeADto, customerDtoResponse);
                 });
-    }
-
-    @Test
-    void GivenWrongId_WhenGetCustomerById_ThenReturnMonoError() {
+        Mockito.verify(customerApplicationService)
+                .getCustomer(customerUdeAId);
     }
 
     private CustomerDto buildCustomerUdeADto() {
