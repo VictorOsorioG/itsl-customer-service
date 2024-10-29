@@ -2,8 +2,10 @@ package com.globant.mentorship.itsl.customer_service.application.service.impl;
 
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.application.service.CustomerApplicationService;
+import com.globant.mentorship.itsl.customer_service.infrastucture.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -11,8 +13,16 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 public class CustomerApplicationServiceImpl implements CustomerApplicationService {
+
+    private final CustomerRepository customerRepository;
+    private final ModelMapper modelMapper;
+
     @Override
     public Mono<CustomerDto> getCustomer(Long id) {
-        return null;
+        return customerRepository.findById(id)
+                .map(customer -> Mono.just(
+                        modelMapper.map(customer, CustomerDto.class)
+                ))
+                .orElseThrow();
     }
 }
