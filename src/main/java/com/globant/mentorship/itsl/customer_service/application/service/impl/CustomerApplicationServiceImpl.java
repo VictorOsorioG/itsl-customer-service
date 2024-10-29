@@ -15,11 +15,14 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CustomerApplicationServiceImpl implements CustomerApplicationService {
 
+    private final String LOG_PREFIX = "Customer Application Service >>>";
+
     private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
 
     @Override
     public Mono<CustomerDto> getCustomer(Long id) {
+        log.info("{} Find customer by id {}", LOG_PREFIX, id);
         return customerRepository.findById(id)
                 .map(customer -> Mono.just(
                         modelMapper.map(customer, CustomerDto.class)

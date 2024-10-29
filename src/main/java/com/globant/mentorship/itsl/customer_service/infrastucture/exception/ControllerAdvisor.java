@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ControllerAdvisor {
 
-    private final String LOG_PREFIX = "CONTROLLER ADVICE >>> Exception caught in";
+    private final String LOG_PREFIX = "Controller Advisor >>> Exception caught in";
 
     @ExceptionHandler(StandardException.class)
     public ResponseEntity<StandardError> handlerStandardException(StandardException standardException) {

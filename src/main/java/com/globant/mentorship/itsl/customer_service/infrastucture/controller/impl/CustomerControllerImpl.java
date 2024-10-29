@@ -17,11 +17,14 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/customer")
 public class CustomerControllerImpl implements CustomerController {
 
+    private final String LOG_PREFIX = "Customer Controller >>>";
+
     private final CustomerApplicationService customerApplicationService;
 
     @Override
     @GetMapping("/{id}")
     public Mono<CustomerDto> getCustomerById(@PathVariable Long id) {
+        log.info("{} Getting customer by id {}", LOG_PREFIX, id);
         return customerApplicationService.getCustomer(id);
     }
 }
