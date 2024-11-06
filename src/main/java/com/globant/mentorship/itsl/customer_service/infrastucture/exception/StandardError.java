@@ -13,5 +13,4 @@ public class StandardError {
     private String code;
     private LocalDateTime timestamp;
     private String description;
-    private HttpStatus status;
 }
