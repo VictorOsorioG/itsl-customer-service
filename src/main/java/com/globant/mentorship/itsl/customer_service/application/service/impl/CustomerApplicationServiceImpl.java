@@ -27,6 +27,6 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
                 .map(customer -> Mono.just(
                         modelMapper.map(customer, CustomerDto.class)
                 ))
-                .orElseThrow(CustomerNotFound::new);
+                .orElse(Mono.error(CustomerNotFound::new));
     }
 }
