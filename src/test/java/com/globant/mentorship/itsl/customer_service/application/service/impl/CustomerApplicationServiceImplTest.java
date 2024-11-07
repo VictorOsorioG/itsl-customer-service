@@ -11,9 +11,15 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,6 +59,22 @@ class CustomerApplicationServiceImplTest {
                 .thenReturn(Optional.empty());
         assertThrows(CustomerNotFound.class,
                 () -> customerApplicationService.getCustomer(wrongId));
+    }
+
+    @Test
+    void WhenGetCustomerCatalogue_ThenReturnFluxDto() {
+        Customer globantCustomer = Customer.builder()
+                .name("Globant")
+                .active(true)
+                .build();
+        Pageable pageable = PageRequest.of(1, 10);
+        Page<Customer> customersPage = new PageImpl<>(List.of(globantCustomer, buildCustomerUdeA()));
+        when(customerRepository.findAll(pageable))
+                .thenReturn(customersPage);
+        Flux<CustomerDto> customerDtoFlux = customerApplicationService.getCustomerCatalogue(pageable);
+        StepVerifier.create(customerDtoFlux)
+                .expectNextCount(2)
+                .verifyComplete();
     }
 
     private Customer buildCustomerUdeA() {
