@@ -8,8 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -42,6 +51,31 @@ class CustomerControllerImplTest {
                 });
         Mockito.verify(customerApplicationService)
                 .getCustomer(customerUdeAId);
+    }
+
+    @Test
+    void WhenGetCustomerCatalogue_ThenReturnFluxCustomer() {
+        CustomerDto globantCustomer = CustomerDto.builder()
+                .name("Globant")
+                .active(true)
+                .build();
+        int pageNumber = 1;
+        int pageSize = 10;
+        Mockito.when(customerApplicationService.getCustomerCatalogue(PageRequest.of(pageNumber, pageSize)))
+                .thenReturn(Flux.fromIterable(List.of(globantCustomer, buildCustomerUdeADto())));
+        webTestClient.get()
+                .uri(UriComponentsBuilder.fromUriString(BASE_URL + "/catalogue")
+                        .queryParam("pageNumber", pageNumber)
+                        .queryParam("pageSize", pageSize)
+                        .toUriString()
+                )
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .expectBodyList(CustomerDto.class)
+                .consumeWith(listEntityExchangeResult -> {
+                   assert (Objects.requireNonNull(listEntityExchangeResult.getResponseBody()).size() == 2);
+                });
     }
 
     private CustomerDto buildCustomerUdeADto() {
