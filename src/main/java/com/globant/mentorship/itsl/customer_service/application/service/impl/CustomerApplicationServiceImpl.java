@@ -7,7 +7,9 @@ import com.globant.mentorship.itsl.customer_service.infrastucture.repository.Cus
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -28,5 +30,15 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
                         modelMapper.map(customer, CustomerDto.class)
                 ))
                 .orElse(Mono.error(CustomerNotFound::new));
+    }
+
+    @Override
+    public Flux<CustomerDto> getCustomerCatalogue(Pageable pageable) {
+        log.info("{} Find customers", LOG_PREFIX);
+        return Flux.fromIterable(
+                customerRepository.findAll(pageable).stream()
+                        .map(customer -> modelMapper.map(customer, CustomerDto.class))
+                        .toList()
+        );
     }
 }
