@@ -57,8 +57,9 @@ class CustomerApplicationServiceImplTest {
         Long wrongId = 0L;
         when(customerRepository.findById(wrongId))
                 .thenReturn(Optional.empty());
-        assertThrows(CustomerNotFound.class,
-                () -> customerApplicationService.getCustomer(wrongId));
+        StepVerifier.create(customerApplicationService.getCustomer(wrongId))
+                .expectError(CustomerNotFound.class)
+                .verify();
     }
 
     @Test
