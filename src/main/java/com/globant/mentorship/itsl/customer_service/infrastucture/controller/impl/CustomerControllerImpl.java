@@ -3,9 +3,12 @@ package com.globant.mentorship.itsl.customer_service.infrastucture.controller.im
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.application.service.CustomerApplicationService;
 import com.globant.mentorship.itsl.customer_service.infrastucture.controller.CustomerController;
+import com.globant.mentorship.itsl.customer_service.infrastucture.dto.CustomerRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,5 +38,13 @@ public class CustomerControllerImpl implements CustomerController {
     ) {
         log.info("{} Getting customer catalogue", LOG_PREFIX);
         return customerApplicationService.getCustomerCatalogue(PageRequest.of(pageNumber, pageSize));
+    }
+
+    @Override
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public Mono<Void> createCustomer(@Valid CustomerRequest customerRequest) {
+        log.info("{} Creating customer", LOG_PREFIX);
+        return customerApplicationService.createCustomer(customerRequest);
     }
 }
