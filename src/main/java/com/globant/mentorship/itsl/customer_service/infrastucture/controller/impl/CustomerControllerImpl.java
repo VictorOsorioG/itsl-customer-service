@@ -43,7 +43,7 @@ public class CustomerControllerImpl implements CustomerController {
     @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Void> createCustomer(@Valid CustomerRequest customerRequest) {
+    public Mono<Void> createCustomer(@Valid @RequestBody CustomerRequest customerRequest) {
         log.info("{} Creating customer", LOG_PREFIX);
         return customerApplicationService.createCustomer(customerRequest);
     }
