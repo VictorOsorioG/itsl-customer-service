@@ -2,6 +2,9 @@ package com.globant.mentorship.itsl.customer_service.application.service.impl;
 
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.application.service.CustomerApplicationService;
+import com.globant.mentorship.itsl.customer_service.domain.model.Customer;
+import com.globant.mentorship.itsl.customer_service.infrastucture.dto.CustomerRequest;
+import com.globant.mentorship.itsl.customer_service.infrastucture.exception.standard_exception.CustomerNameUnique;
 import com.globant.mentorship.itsl.customer_service.infrastucture.exception.standard_exception.CustomerNotFound;
 import com.globant.mentorship.itsl.customer_service.infrastucture.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,5 +43,27 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
                         .map(customer -> modelMapper.map(customer, CustomerDto.class))
                         .toList()
         );
+    }
+
+    @Override
+    public Mono<Void> createCustomer(CustomerRequest customerRequest) {
+        checkCustomerNameUnique(customerRequest.getName());
+        log.info("{} Saving customer", LOG_PREFIX);
+        customerRepository.save(buildCustomer(customerRequest));
+        return Mono.empty();
+    }
+
+    private void checkCustomerNameUnique(String customerName) {
+        log.info("{} Checking customer name {} is unique", LOG_PREFIX, customerName);
+        if (customerRepository.existsByName(customerName)) {
+            throw new CustomerNameUnique();
+        }
+    }
+
+    private Customer buildCustomer(CustomerRequest customerRequest) {
+        return Customer.builder()
+                .name(customerRequest.getName())
+                .active(true)
+                .build();
     }
 }
