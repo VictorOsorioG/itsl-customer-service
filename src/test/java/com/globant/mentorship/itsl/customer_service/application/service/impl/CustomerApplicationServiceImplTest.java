@@ -2,6 +2,8 @@ package com.globant.mentorship.itsl.customer_service.application.service.impl;
 
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.domain.model.Customer;
+import com.globant.mentorship.itsl.customer_service.infrastucture.dto.CustomerRequest;
+import com.globant.mentorship.itsl.customer_service.infrastucture.exception.standard_exception.CustomerNameUnique;
 import com.globant.mentorship.itsl.customer_service.infrastucture.exception.standard_exception.CustomerNotFound;
 import com.globant.mentorship.itsl.customer_service.infrastucture.repository.CustomerRepository;
 import org.junit.jupiter.api.Test;
@@ -76,6 +78,33 @@ class CustomerApplicationServiceImplTest {
         StepVerifier.create(customerDtoFlux)
                 .expectNextCount(2)
                 .verifyComplete();
+    }
+
+    @Test
+    void GivenCustomerRequest_WhenCreateCustomer_ThenReturnMonoEmpty() {
+        String udea = "UdeA";
+        CustomerRequest customerUdeARequest = CustomerRequest.builder()
+                .name(udea)
+                .build();
+        when(customerRepository.existsByName(udea))
+                .thenReturn(false);
+        customerApplicationService.createCustomer(customerUdeARequest);
+        verify(customerRepository)
+                .save(any(Customer.class));
+    }
+
+    @Test
+    void GivenCustomerRequest_WhenCreateCustomer_ThenThrowCustomerNameUnique() {
+        String udea = "UdeA";
+        CustomerRequest customerUdeARequest = CustomerRequest.builder()
+                .name("UdeA")
+                .build();
+        when(customerRepository.existsByName(udea))
+                .thenReturn(true);
+        StepVerifier.create(customerApplicationService.createCustomer(customerUdeARequest))
+                .expectError(CustomerNameUnique.class)
+                .verify();
+
     }
 
     private Customer buildCustomerUdeA() {
