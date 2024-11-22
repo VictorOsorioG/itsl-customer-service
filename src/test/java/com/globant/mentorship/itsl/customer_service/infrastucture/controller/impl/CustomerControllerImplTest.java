@@ -2,6 +2,7 @@ package com.globant.mentorship.itsl.customer_service.infrastucture.controller.im
 
 import com.globant.mentorship.itsl.customer_service.application.dto.CustomerDto;
 import com.globant.mentorship.itsl.customer_service.application.service.CustomerApplicationService;
+import com.globant.mentorship.itsl.customer_service.infrastucture.dto.CustomerRequest;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,8 +72,41 @@ class CustomerControllerImplTest {
                 .is2xxSuccessful()
                 .expectBodyList(CustomerDto.class)
                 .consumeWith(listEntityExchangeResult -> {
-                   assert (Objects.requireNonNull(listEntityExchangeResult.getResponseBody()).size() == 2);
+                    assert (Objects.requireNonNull(listEntityExchangeResult.getResponseBody()).size() == 2);
                 });
+    }
+
+    @Test
+    void GivenCustomerRequest_WhenCreateCustomer_ThenReturnCreatedStatusCode() {
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .name("UdeA")
+                .build();
+        webTestClient.post()
+                .uri(BASE_URL)
+                .bodyValue(customerRequest)
+                .exchange()
+                .expectStatus()
+                .isCreated();
+    }
+
+    @Test
+    void GivenInvalidCustomerRequest_WhenCreateCustomer_ThenReturnError() {
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .name("")
+                .build();
+        webTestClient.post()
+                .uri(BASE_URL)
+                .bodyValue(customerRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(stringEntityExchangeResult -> {
+                            String response = stringEntityExchangeResult.getResponseBody();
+                            assert Objects.nonNull(response);
+                            assertTrue(response.contains("Customer name is mandatory and cannot be blank"));
+                        }
+                );
     }
 
     private CustomerDto buildCustomerUdeADto() {
