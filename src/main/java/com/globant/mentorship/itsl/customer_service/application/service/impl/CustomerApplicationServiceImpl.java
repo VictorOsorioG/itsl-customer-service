@@ -47,17 +47,14 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
 
     @Override
     public Mono<Void> createCustomer(CustomerRequest customerRequest) {
-        checkCustomerNameUnique(customerRequest.getName());
+        String customerName = customerRequest.getName();
+        log.info("{} Checking customer name {} is unique", LOG_PREFIX, customerName);
+        if (customerRepository.existsByName(customerName)) {
+            return Mono.error(CustomerNameUnique::new);
+        }
         log.info("{} Saving customer", LOG_PREFIX);
         customerRepository.save(buildCustomer(customerRequest));
         return Mono.empty();
-    }
-
-    private void checkCustomerNameUnique(String customerName) {
-        log.info("{} Checking customer name {} is unique", LOG_PREFIX, customerName);
-        if (customerRepository.existsByName(customerName)) {
-            throw new CustomerNameUnique();
-        }
     }
 
     private Customer buildCustomer(CustomerRequest customerRequest) {
