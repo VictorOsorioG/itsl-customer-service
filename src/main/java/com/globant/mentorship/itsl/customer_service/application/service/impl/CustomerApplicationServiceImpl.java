@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,6 +27,7 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
     private final ModelMapper modelMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Mono<CustomerDto> getCustomer(Long id) {
         log.info("{} Find customer by id {}", LOG_PREFIX, id);
         return customerRepository.findById(id)
@@ -36,6 +38,7 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Flux<CustomerDto> getCustomerCatalogue(Pageable pageable) {
         log.info("{} Find customers", LOG_PREFIX);
         return Flux.fromIterable(
@@ -46,6 +49,7 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
     }
 
     @Override
+    @Transactional
     public Mono<Void> createCustomer(CustomerRequest customerRequest) {
         String customerName = customerRequest.getName();
         log.info("{} Checking customer name {} is unique", LOG_PREFIX, customerName);
