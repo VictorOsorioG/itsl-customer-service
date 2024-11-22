@@ -109,6 +109,54 @@ class CustomerControllerImplTest {
                 );
     }
 
+    @Test
+    void GivenCustomerRequestAndId_WhenUpdateCustomer_TheReturnCustomerUpdated() {
+        Long udeaId = 1L;
+        CustomerDto udeaCustomer = CustomerDto.builder()
+                .name("UdeA")
+                .active(false)
+                .build();
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .name("UdeA")
+                .active(false)
+                .build();
+        Mockito.when(customerApplicationService.updateCustomer(udeaId, customerRequest))
+                .thenReturn(Mono.just(udeaCustomer));
+        webTestClient.patch()
+                .uri( BASE_URL + "/" + udeaId)
+                .bodyValue(customerRequest)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(CustomerDto.class)
+                .consumeWith(exchangeResult -> {
+                    CustomerDto response = exchangeResult.getResponseBody();
+                    assertNotNull(response);
+                    assertFalse(response.getActive());
+                });
+    }
+
+    @Test
+    void GivenInvalidCustomerRequest_WhenUpdateCustomer_ThenReturnError() {
+        long udeaId = 1L;
+        CustomerRequest customerRequest = CustomerRequest.builder()
+                .name("")
+                .build();
+        webTestClient.patch()
+                .uri( BASE_URL + "/" + udeaId)
+                .bodyValue(customerRequest)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(stringEntityExchangeResult -> {
+                            String response = stringEntityExchangeResult.getResponseBody();
+                            assert Objects.nonNull(response);
+                            assertTrue(response.contains("Customer name is mandatory and cannot be blank"));
+                        }
+                );
+    }
+
     private CustomerDto buildCustomerUdeADto() {
         return CustomerDto.builder()
                 .name("UdeA")
