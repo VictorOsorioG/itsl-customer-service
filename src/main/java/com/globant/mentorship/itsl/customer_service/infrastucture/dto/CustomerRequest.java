@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class CustomerRequest {
     @NotBlank(message = "Customer name is mandatory and cannot be blank")
     private String name;
+    private boolean active;
 }
