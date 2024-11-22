@@ -47,4 +47,11 @@ public class CustomerControllerImpl implements CustomerController {
         log.info("{} Creating customer", LOG_PREFIX);
         return customerApplicationService.createCustomer(customerRequest);
     }
+
+    @Override
+    @PatchMapping("/{id}")
+    public Mono<CustomerDto> updateCustomer(@PathVariable Long id, @Valid @RequestBody CustomerRequest customerRequest) {
+        log.info("{} Updating customer with id {}", LOG_PREFIX, id);
+        return customerApplicationService.updateCustomer(id, customerRequest);
+    }
 }

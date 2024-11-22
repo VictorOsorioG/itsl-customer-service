@@ -9,4 +9,5 @@ public interface CustomerController {
     Mono<CustomerDto> getCustomerById(Long id);
     Flux<CustomerDto> getCustomerCatalogue(Integer pageNumber, Integer pageSize);
     Mono<Void> createCustomer(CustomerRequest customerRequest);
+    Mono<CustomerDto> updateCustomer(Long id, CustomerRequest customerRequest);
 }
