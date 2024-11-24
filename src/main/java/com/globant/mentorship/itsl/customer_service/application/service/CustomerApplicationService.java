@@ -13,5 +13,7 @@ public interface CustomerApplicationService {
     Flux<CustomerDto> getCustomerCatalogue(Pageable pageable);
 
     Mono<Void> createCustomer(CustomerRequest customerRequest);
+
+    Mono<CustomerDto> updateCustomer(Long id, CustomerRequest customerRequest);
 }
 
