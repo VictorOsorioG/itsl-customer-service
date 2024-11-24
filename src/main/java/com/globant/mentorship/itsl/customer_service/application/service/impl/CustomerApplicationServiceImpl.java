@@ -51,14 +51,23 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
     @Override
     @Transactional
     public Mono<Void> createCustomer(CustomerRequest customerRequest) {
-        String customerName = customerRequest.getName();
+        return checkCustomerNameUnique(customerRequest.getName())
+                .then(Mono.defer(() -> {
+                    log.info("{} Saving customer", LOG_PREFIX);
+                    customerRepository.save(buildCustomer(customerRequest));
+                    return Mono.empty();
+                }));
+    }
+
+    @Override
+    public Mono<CustomerDto> updateCustomer(Long id, CustomerRequest customerRequest) {
+        return null;
+    }
+
+    private Mono<Void> checkCustomerNameUnique(String customerName) {
         log.info("{} Checking customer name {} is unique", LOG_PREFIX, customerName);
-        if (customerRepository.existsByName(customerName)) {
-            return Mono.error(CustomerNameUnique::new);
-        }
-        log.info("{} Saving customer", LOG_PREFIX);
-        customerRepository.save(buildCustomer(customerRequest));
-        return Mono.empty();
+        return Mono.fromCallable(() -> customerRepository.existsByName(customerName))
+                .flatMap(exist -> exist ? Mono.error(CustomerNameUnique::new) : Mono.empty());
     }
 
     private Customer buildCustomer(CustomerRequest customerRequest) {
