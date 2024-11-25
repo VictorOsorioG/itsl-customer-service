@@ -29,7 +29,7 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
     @Override
     @Transactional(readOnly = true)
     public Mono<CustomerDto> getCustomer(Long id) {
-        log.info("{} Find customer by id {}", LOG_PREFIX, id);
+        log.info("{} Find customer by id '{}'", LOG_PREFIX, id);
         return customerRepository.findById(id)
                 .map(customer -> Mono.just(
                         modelMapper.map(customer, CustomerDto.class)
@@ -61,13 +61,24 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
 
     @Override
     public Mono<CustomerDto> updateCustomer(Long id, CustomerRequest customerRequest) {
-        return null;
+        return checkCustomerNameUnique(customerRequest.getName())
+                .then(Mono.defer(() -> customerRepository.findById(id)
+                        .map(customer -> {
+                            log.info("{} Updating customer with id '{}'", LOG_PREFIX, id);
+                            modelMapper.map(customerRequest, customer);
+                            customerRepository.save(customer);
+                            return Mono.just(
+                                    modelMapper.map(customer, CustomerDto.class)
+                            );
+                        })
+                        .orElse(Mono.error(CustomerNotFound::new)))
+                );
     }
 
     private Mono<Void> checkCustomerNameUnique(String customerName) {
-        log.info("{} Checking customer name {} is unique", LOG_PREFIX, customerName);
+        log.info("{} Checking customer name '{}' is unique", LOG_PREFIX, customerName);
         return Mono.fromCallable(() -> customerRepository.existsByName(customerName))
-                .flatMap(exist -> exist ? Mono.error(CustomerNameUnique::new) : Mono.empty());
+                .flatMap(exists -> exists ? Mono.error(CustomerNameUnique::new) : Mono.empty());
     }
 
     private Customer buildCustomer(CustomerRequest customerRequest) {
