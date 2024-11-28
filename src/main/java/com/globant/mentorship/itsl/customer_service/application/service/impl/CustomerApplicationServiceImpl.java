@@ -60,6 +60,7 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
     }
 
     @Override
+    @Transactional
     public Mono<CustomerDto> updateCustomer(Long id, CustomerRequest customerRequest) {
         return checkCustomerNameUnique(customerRequest.getName())
                 .then(Mono.defer(() -> customerRepository.findById(id)

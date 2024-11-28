@@ -107,6 +107,30 @@ class CustomerApplicationServiceImplTest {
 
     }
 
+    @Test
+    void GivenCustomerRequestAndId_WhenUpdateCustomer_TheReturnCustomerUpdated() {
+        Long udeaId = 1L;
+        CustomerRequest customerUdeARequest = CustomerRequest.builder()
+                .name("UdeA")
+                .active(false)
+                .build();
+        Customer customerUdeA = Customer.builder()
+                .id(udeaId)
+                .name("UdeA")
+                .active(true)
+                .build();
+        when(customerRepository.findById(udeaId))
+                .thenReturn(Optional.of(customerUdeA));
+        StepVerifier.create(customerApplicationService.updateCustomer(udeaId, customerUdeARequest))
+                .consumeNextWith(customerDto -> {
+                    assert Objects.nonNull(customerDto);
+                    assertFalse(customerDto.getActive());
+                })
+                .verifyComplete();
+        verify(customerRepository)
+                .save(any(Customer.class));
+    }
+
     private Customer buildCustomerUdeA() {
         return Customer.builder()
                 .id(1L)
