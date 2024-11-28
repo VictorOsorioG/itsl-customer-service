@@ -88,13 +88,15 @@ class CustomerApplicationServiceImplTest {
                 .build();
         when(customerRepository.existsByName(udea))
                 .thenReturn(false);
-        customerApplicationService.createCustomer(customerUdeARequest);
+        StepVerifier.create(customerApplicationService.createCustomer(customerUdeARequest))
+                .expectNext()
+                .verifyComplete();
         verify(customerRepository)
                 .save(any(Customer.class));
     }
 
     @Test
-    void GivenCustomerRequest_WhenCreateCustomer_ThenThrowCustomerNameUnique() {
+    void GivenWrongCustomerRequest_WhenCreateCustomer_ThenThrowCustomerNameUnique() {
         String udea = "UdeA";
         CustomerRequest customerUdeARequest = CustomerRequest.builder()
                 .name("UdeA")
@@ -119,6 +121,8 @@ class CustomerApplicationServiceImplTest {
                 .name("UdeA")
                 .active(true)
                 .build();
+        when(customerRepository.existsByName("UdeA"))
+                .thenReturn(false);
         when(customerRepository.findById(udeaId))
                 .thenReturn(Optional.of(customerUdeA));
         StepVerifier.create(customerApplicationService.updateCustomer(udeaId, customerUdeARequest))
