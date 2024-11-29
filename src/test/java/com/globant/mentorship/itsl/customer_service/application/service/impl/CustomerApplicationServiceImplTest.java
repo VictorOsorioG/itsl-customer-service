@@ -135,6 +135,30 @@ class CustomerApplicationServiceImplTest {
         verify(customerRepository).save(any(Customer.class));
     }
 
+    @Test
+    void GivenIdAndCustomerRequestWithNameNoUnique_WhenUpdateCustomer_ThenThrowCustomerNameUnique() {
+        Long udeaId = 1L;
+        CustomerRequest customerGlobantRequest = CustomerRequest.builder()
+                .name("Globant")
+                .active(false)
+                .build();
+        Customer customerUdeA = Customer.builder()
+                .id(udeaId)
+                .name("UdeA")
+                .active(true)
+                .build();
+        when(customerRepository.findById(udeaId))
+                .thenReturn(Optional.of(customerUdeA));
+        if (!customerUdeA.getName().equals(customerGlobantRequest.getName())) {
+            when(customerRepository.existsByName("Globant"))
+                    .thenReturn(true);
+        }
+        StepVerifier.create(customerApplicationService.updateCustomer(udeaId, customerGlobantRequest))
+                .expectError(CustomerNameUnique.class)
+                .verify();
+        verify(customerRepository, never()).save(any(Customer.class));
+    }
+
     private Customer buildCustomerUdeA() {
         return Customer.builder()
                 .id(1L)
