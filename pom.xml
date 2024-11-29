@@ -149,7 +149,7 @@
 									</limits>
 								</rule>
 								<rule>
-									<element>CLASS</element>
+									<element>METHOD</element>
 									<limits>
 										<limit>
 											<counter>COMPLEXITY</counter>
