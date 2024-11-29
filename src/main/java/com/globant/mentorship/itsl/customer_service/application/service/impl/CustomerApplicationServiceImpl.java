@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Optional;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -62,18 +64,24 @@ public class CustomerApplicationServiceImpl implements CustomerApplicationServic
     @Override
     @Transactional
     public Mono<CustomerDto> updateCustomer(Long id, CustomerRequest customerRequest) {
-        return checkCustomerNameUnique(customerRequest.getName())
-                .then(Mono.defer(() -> customerRepository.findById(id)
+        return Mono.fromCallable(() -> customerRepository.findById(id))
+                .flatMap(optionalCustomer -> optionalCustomer
                         .map(customer -> {
-                            log.info("{} Updating customer with id '{}'", LOG_PREFIX, id);
-                            modelMapper.map(customerRequest, customer);
-                            customerRepository.save(customer);
-                            return Mono.just(
-                                    modelMapper.map(customer, CustomerDto.class)
-                            );
+                            if (!customer.getName().equals(customerRequest.getName())) {
+                                return checkCustomerNameUnique(customerRequest.getName())
+                                        .then(Mono.defer(() -> updateAndMapCustomer(customer, customerRequest)));
+                            } else {
+                                return updateAndMapCustomer(customer, customerRequest);
+                            }
                         })
-                        .orElse(Mono.error(CustomerNotFound::new)))
-                );
+                        .orElse(Mono.error(CustomerNotFound::new)));
+    }
+
+    private Mono<CustomerDto> updateAndMapCustomer(Customer customer, CustomerRequest customerRequest) {
+        log.info("{} Updating customer with id '{}'", LOG_PREFIX, customer.getId());
+        modelMapper.map(customerRequest, customer);
+        customerRepository.save(customer);
+        return Mono.just(modelMapper.map(customer, CustomerDto.class));
     }
 
     private Mono<Void> checkCustomerNameUnique(String customerName) {

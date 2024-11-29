@@ -106,7 +106,6 @@ class CustomerApplicationServiceImplTest {
         StepVerifier.create(customerApplicationService.createCustomer(customerUdeARequest))
                 .expectError(CustomerNameUnique.class)
                 .verify();
-
     }
 
     @Test
@@ -121,18 +120,19 @@ class CustomerApplicationServiceImplTest {
                 .name("UdeA")
                 .active(true)
                 .build();
-        when(customerRepository.existsByName("UdeA"))
-                .thenReturn(false);
         when(customerRepository.findById(udeaId))
                 .thenReturn(Optional.of(customerUdeA));
+        if (!customerUdeA.getName().equals(customerUdeARequest.getName())) {
+            when(customerRepository.existsByName("UdeA"))
+                    .thenReturn(false);
+        }
+
         StepVerifier.create(customerApplicationService.updateCustomer(udeaId, customerUdeARequest))
-                .consumeNextWith(customerDto -> {
-                    assert Objects.nonNull(customerDto);
-                    assertFalse(customerDto.getActive());
-                })
+                .expectNextMatches(customerDto ->
+                        customerDto.getName().equals("UdeA") && !customerDto.getActive()
+                )
                 .verifyComplete();
-        verify(customerRepository)
-                .save(any(Customer.class));
+        verify(customerRepository).save(any(Customer.class));
     }
 
     private Customer buildCustomerUdeA() {
